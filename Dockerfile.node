@@ -1,0 +1,23 @@
+FROM base
+
+ARG NODE_VERSION=20.14.0
+ARG YARN_VERSION=1.22.19
+ARG PNPM_VERSION=9.1.3
+
+# Install Node
+RUN [[ $(uname -m) == "x86_64" ]] && ARCH="x64" || ARCH="arm64" && \
+    curl -L -o /tmp/node.tar.xz \
+    "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" && \
+    sudo tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 && \
+    rm /tmp/node.tar.xz && \
+    sudo ln -sf /usr/local/bin/node /usr/local/bin/nodejs
+
+RUN curl -L -o yarn.tar.gz "https://yarnpkg.com/downloads/${YARN_VERSION}/yarn-v${YARN_VERSION}.tar.gz" && \
+    sudo tar -xzf yarn.tar.gz -C /opt/ && \
+    rm yarn.tar.gz && \
+    sudo ln -s /opt/yarn-v${YARN_VERSION}/bin/yarn /usr/local/bin/yarn && \
+    sudo ln -s /opt/yarn-v${YARN_VERSION}/bin/yarnpkg /usr/local/bin/yarnpkg
+
+# Enable Corepack and activate pnpm
+RUN sudo corepack enable && \
+    sudo corepack prepare "pnpm@${PNPM_VERSION}" --activate
