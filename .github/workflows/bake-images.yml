@@ -47,13 +47,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Bake base amd64
+      - name: Bake amd64
         uses: docker/bake-action@v6.8.0
         env:
           REGISTRY: ${{ env.REGISTRY_HOST }}/${{ env.IMAGE_NAMESPACE }}
         with:
           files: docker-bake.hcl
-          targets: base
+          targets: all
           push: true
           set: |
             *.platform=linux/amd64
@@ -63,13 +63,13 @@ jobs:
             *.attest=type=sbom
           provenance: true
 
-      - name: Bake base arm64
+      - name: Bake arm64
         uses: docker/bake-action@v6.8.0
         env:
           REGISTRY: ${{ env.REGISTRY_HOST }}/${{ env.IMAGE_NAMESPACE }}
         with:
           files: docker-bake.hcl
-          targets: base
+          targets: all
           push: true
           set: |
             *.platform=linux/arm64
@@ -78,102 +78,3 @@ jobs:
             *.output=type=registry
             *.attest=type=sbom
           provenance: true
-
-      - name: Bake php amd64
-        uses: docker/bake-action@v6.8.0
-        env:
-          REGISTRY: ${{ env.REGISTRY_HOST }}/${{ env.IMAGE_NAMESPACE }}
-        with:
-          files: docker-bake.hcl
-          targets: php
-          push: true
-          provenance: true
-          set: |
-            *.platform=linux/amd64
-            *.cache-from=type=gha,scope=${{ github.repository }}
-            *.cache-to=type=gha,scope=${{ github.repository }},mode=max
-            *.output=type=registry
-            *.attest=type=sbom
-
-      - name: Bake php arm64
-        uses: docker/bake-action@v6.8.0
-        env:
-          REGISTRY: ${{ env.REGISTRY_HOST }}/${{ env.IMAGE_NAMESPACE }}
-        with:
-          files: docker-bake.hcl
-          targets: php
-          push: true
-          provenance: true
-          set: |
-            *.platform=linux/arm64
-            *.cache-from=type=gha,scope=${{ github.repository }}
-            *.cache-to=type=gha,scope=${{ github.repository }},mode=max
-            *.output=type=registry
-            *.attest=type=sbom
-
-      - name: Bake node amd64
-        uses: docker/bake-action@v6.8.0
-        env:
-          REGISTRY: ${{ env.REGISTRY_HOST }}/${{ env.IMAGE_NAMESPACE }}
-        with:
-          files: docker-bake.hcl
-          targets: node
-          push: true
-          provenance: true
-          set: |
-            *.platform=linux/amd64
-            *.cache-from=type=gha,scope=${{ github.repository }}
-            *.cache-to=type=gha,scope=${{ github.repository }},mode=max
-            *.output=type=registry
-            *.attest=type=sbom
-
-      - name: Bake node arm64
-        uses: docker/bake-action@v6.8.0
-        env:
-          REGISTRY: ${{ env.REGISTRY_HOST }}/${{ env.IMAGE_NAMESPACE }}
-        with:
-          files: docker-bake.hcl
-          targets: node
-          push: true
-          provenance: true
-          set: |
-            *.platform=linux/arm64
-            *.cache-from=type=gha,scope=${{ github.repository }}
-            *.cache-to=type=gha,scope=${{ github.repository }},mode=max
-            *.output=type=registry
-            *.attest=type=sbom
-
-      - name: Bake php-node amd64
-        uses: docker/bake-action@v6.8.0
-        env:
-          REGISTRY: ${{ env.REGISTRY_HOST }}/${{ env.IMAGE_NAMESPACE }}
-        with:
-          files: docker-bake.hcl
-          targets: php-node
-          push: true
-          provenance: true
-          set: |
-            *.platform=linux/amd64
-            *.cache-from=type=gha,scope=${{ github.repository }}
-            *.cache-to=type=gha,scope=${{ github.repository }},mode=max
-            *.output=type=registry
-            *.attest=type=sbom
-
-      - name: Bake php-node arm64
-        uses: docker/bake-action@v6.8.0
-        env:
-          REGISTRY: ${{ env.REGISTRY_HOST }}/${{ env.IMAGE_NAMESPACE }}
-        with:
-          files: docker-bake.hcl
-          targets: php-node
-          push: true
-          provenance: true
-          set: |
-            *.platform=linux/arm64
-            *.cache-from=type=gha,scope=${{ github.repository }}
-            *.cache-to=type=gha,scope=${{ github.repository }},mode=max
-            *.output=type=registry
-            *.attest=type=sbom
-
-      - name: Clean up disk
-        run: docker system prune -af || true
