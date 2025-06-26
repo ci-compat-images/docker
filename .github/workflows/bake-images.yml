@@ -9,8 +9,6 @@ on:
         description: "Bake group to build (default = all)"
         default: all
         required: false
-  # schedule:
-  # - cron: '0 3 * * 1'      # Monday 03:00 Berlin
 
 env:
   REGISTRY_HOST: ghcr.io
@@ -47,34 +45,66 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Bake amd64
-        uses: docker/bake-action@v6.8.0
+      - name: Bake base
+        uses: docker/bake-action@v6
         env:
           REGISTRY: ${{ env.REGISTRY_HOST }}/${{ env.IMAGE_NAMESPACE }}
         with:
           files: docker-bake.hcl
-          targets: all
+          targets: base
           push: true
           set: |
-            *.platform=linux/amd64
+            *.platform=linux/amd64,linux/arm64
             *.cache-from=type=gha,scope=${{ github.repository }}
             *.cache-to=type=gha,scope=${{ github.repository }},mode=max
             *.output=type=registry
             *.attest=type=sbom
           provenance: true
 
-      - name: Bake arm64
-        uses: docker/bake-action@v6.8.0
+      - name: Bake php
+        uses: docker/bake-action@v6
         env:
           REGISTRY: ${{ env.REGISTRY_HOST }}/${{ env.IMAGE_NAMESPACE }}
         with:
           files: docker-bake.hcl
-          targets: all
+          targets: php
           push: true
+          provenance: true
           set: |
-            *.platform=linux/arm64
+            *.platform=linux/amd64,linux/arm64
             *.cache-from=type=gha,scope=${{ github.repository }}
             *.cache-to=type=gha,scope=${{ github.repository }},mode=max
             *.output=type=registry
             *.attest=type=sbom
+
+      - name: Bake node
+        uses: docker/bake-action@v6
+        env:
+          REGISTRY: ${{ env.REGISTRY_HOST }}/${{ env.IMAGE_NAMESPACE }}
+        with:
+          files: docker-bake.hcl
+          targets: node
+          push: true
           provenance: true
+          set: |
+            *.platform=linux/amd64,linux/arm64
+            *.cache-from=type=gha,scope=${{ github.repository }}
+            *.cache-to=type=gha,scope=${{ github.repository }},mode=max
+            *.output=type=registry
+            *.attest=type=sbom
+
+      - name: Bake php-node
+        uses: docker/bake-action@v6
+        env:
+          REGISTRY: ${{ env.REGISTRY_HOST }}/${{ env.IMAGE_NAMESPACE }}
+        with:
+          files: docker-bake.hcl
+          targets: php-node
+          push: true
+          provenance: true
+          set: |
+            *.platform=linux/amd64,linux/arm64
+            *.cache-from=type=gha,scope=${{ github.repository }}
+            *.cache-to=type=gha,scope=${{ github.repository }},mode=max
+            *.output=type=registry
+            *.attest=type=sbom
